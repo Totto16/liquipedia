@@ -59,22 +59,24 @@ async function ready(callback: () => void | Promise<void>, fully = false) {
     }
 }
 
-type Places = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16;
+type Place = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16;
 
-type TeamPlace = Places | 'DNQ';
+type TeamPlace = Place | 'DNQ' | -1;
 
 type PointsObject = {
-    [key in Places]: number;
+    [key in Place]: number;
 };
 
-interface Tournament {
+interface Tournament<P = PointsObject> {
     name: string;
-    points: PointsObject;
+    points: P;
 }
 
 interface Team {
     name: string;
     places: TeamPlace[];
+    points: number;
+    place: number;
 }
 
 interface PGCSite {
@@ -82,27 +84,146 @@ interface PGCSite {
     teams: Team[];
 }
 
-function parsePGCSite(): PGCSite {
-    const teamTable,
-        tournamentTable = document.querySelectorAll('.wikitable');
+function parsePGCSite(alreadyPlayedTournaments: number): PGCSite {
+    const tables = document.querySelectorAll('.wikitable');
+    if (tables.length !== 2) {
+        throw new Error('table amount not correct, did the site change?');
+    }
+    const [teamTable, tournamentTable] = Array.from(tables);
 
+    const tournamentRows: Element[] = Array.from(tournamentTable.querySelectorAll('tr'));
 
-        
+    const tempTournaments = Array.from(tournamentRows[0].querySelectorAll('th'));
+    tempTournaments.splice(0, 1);
+
+    const partialTournaments: Tournament<Partial<PointsObject>>[] = tempTournaments.map((element) => ({
+        name: element.textContent?.trim() ?? '',
+        points: {},
+    }));
+
+    tournamentRows.splice(0, 1);
+
+    for (let i = 0; i < tournamentRows.length; ++i) {
+        const row = tournamentRows[i];
+        const columns = row.querySelectorAll('td');
+        const [_, ..._points] = Array.from(columns);
+
+        for (let j = 0; j < _points.length; ++j) {
+            const points: number = parseInt(_points[j]?.textContent?.trim() ?? '-1');
+            const place: Place = (i + 1) as Place;
+            partialTournaments[j].points[place] = points;
+        }
+    }
+
+    const tournaments: Tournament[] = partialTournaments as Tournament[];
+
+    const teamRows: Element[] = Array.from(teamTable.querySelectorAll('tr'));
+    teamRows.splice(0, 1);
+
+    const teams: Team[] = [];
+    for (const row of teamRows) {
+        const columns = row.querySelectorAll('td');
+        const [_place, _name, ..._tournaments] = Array.from(columns);
+
+        const place: number = parseInt(_place.textContent?.trim() ?? '-1');
+        const name: string = _name.textContent?.trim() ?? '';
+
+        const _totalPoints: number = parseInt(_tournaments.at(-1)?.textContent?.trim() ?? '-1');
+
+        let realTotalPoints: number = 0;
+
+        for (let i = 0; i < alreadyPlayedTournaments; ++i) {
+            const points = parseInt(_tournaments[i].textContent?.trim() ?? '-1');
+            realTotalPoints += points;
+        }
+
+        const places: TeamPlace[] = [];
+
+        function getPlace(pointObject: PointsObject, points: number): TeamPlace {
+            if (points === 0) {
+                return -1;
+            }
+            for (const [key, value] of Object.entries(pointObject)) {
+                if (value === points) {
+                    return parseInt(key) as TeamPlace;
+                }
+            }
+
+            throw new Error(`Couldn't map placement points to place: ${points} Points`);
+        }
+
+        for (let i = 0; i < _tournaments.length - 1; ++i) {
+            const pointsText = _tournaments[i].textContent?.trim() ?? 'DNQ';
+
+            const teamPlace: TeamPlace = pointsText === 'DNQ' ? 'DNQ' : getPlace(tournaments[i].points, parseInt(pointsText));
+            places.push(teamPlace);
+        }
+
+        const localTeam: Team = { name, places, points: realTotalPoints, place };
+        teams.push(localTeam);
+    }
+
+    return {
+        teams,
+        tournaments,
+    };
 }
 
-function calculatePGCPoints(): void {
+function getPGCTeamByName(teams: Team[], name: string): Team {
+    for (const team of teams) {
+        if (team.name === name) {
+            return team;
+        }
+    }
+
+    throw new Error(`No team with name: ${name}`);
+}
+
+// keep in mind, that 16! = 20.922.789.888.000
+function possibleArrangements(teams: Team[], points: PointsObject): number[][] {
+    const result: number[][] = [];
+
+    function allPermutations(temp: number[], limits: number[], index: number): void {
+        if (index === temp.length) {
+            //stop condition for the recursion [base clause]
+            result.push(temp);
+            return;
+        }
+        for (let i = 0; i <= limits[index]; ++i) {
+            temp[index] = i;
+            allPermutations(temp, limits, index + 1); //recursive invokation, for next elements
+        }
+    }
+
+    const temp: number[] = new Array(teams.length).fill(undefined).map((_) => -1);
+    const limits = new Array(teams.length).fill(undefined).map((_) => 16);
+    allPermutations(temp, limits, 0);
+
+    console.log(result);
+
+    return result;
+}
+
+function calculatePGCPoints(alreadyPlayedTournaments: number): void {
     try {
-        const siteInfo = parsePGCSite();
-    } catch (excecption) {
-        console.error(excecption);
-        console.log('Erro in parsing PGC site');
+        const siteInfo = parsePGCSite(alreadyPlayedTournaments);
+        console.log(siteInfo);
+        const qualifiedTeams: Team[] = siteInfo.teams.filter((team) => {
+            return team.places[alreadyPlayedTournaments] != 'DNQ';
+        });
+        const activeTournament = siteInfo.tournaments[alreadyPlayedTournaments];
+        // just to tests
+        const arrangement = possibleArrangements([qualifiedTeams[0], qualifiedTeams[1]], activeTournament.points);
+    } catch (exception) {
+        console.error(exception);
+        console.log('Error in parsing PGC site');
     }
 }
 
 function detectPage(): void {
     switch (location.pathname) {
         case '/pubg/PUBG_Global_Championship/2023/EMEA/Points':
-            calculatePGCPoints();
+            calculatePGCPoints(2);
             break;
         default:
             return;

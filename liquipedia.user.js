@@ -618,8 +618,130 @@ async function ready(callback, fully = false) {
     });
   }
 }
+function parsePGCSite(alreadyPlayedTournaments) {
+  const tables = document.querySelectorAll('.wikitable');
+  if (tables.length !== 2) {
+    throw new Error('table amount not correct, did the site change?');
+  }
+  const [teamTable, tournamentTable] = Array.from(tables);
+  const tournamentRows = Array.from(tournamentTable.querySelectorAll('tr'));
+  const tempTournaments = Array.from(tournamentRows[0].querySelectorAll('th'));
+  tempTournaments.splice(0, 1);
+  const partialTournaments = tempTournaments.map(element => ({
+    name: element.textContent?.trim() ?? '',
+    points: {}
+  }));
+  tournamentRows.splice(0, 1);
+  for (let i = 0; i < tournamentRows.length; ++i) {
+    const row = tournamentRows[i];
+    const columns = row.querySelectorAll('td');
+    const [_, ..._points] = Array.from(columns);
+    for (let j = 0; j < _points.length; ++j) {
+      const points = parseInt(_points[j]?.textContent?.trim() ?? '-1');
+      const place = i + 1;
+      partialTournaments[j].points[place] = points;
+    }
+  }
+  const tournaments = partialTournaments;
+  const teamRows = Array.from(teamTable.querySelectorAll('tr'));
+  teamRows.splice(0, 1);
+  const teams = [];
+  for (const row of teamRows) {
+    const columns = row.querySelectorAll('td');
+    const [_place, _name, ..._tournaments] = Array.from(columns);
+    const place = parseInt(_place.textContent?.trim() ?? '-1');
+    const name = _name.textContent?.trim() ?? '';
+    const _totalPoints = parseInt(_tournaments.at(-1)?.textContent?.trim() ?? '-1');
+    let realTotalPoints = 0;
+    for (let i = 0; i < alreadyPlayedTournaments; ++i) {
+      const points = parseInt(_tournaments[i].textContent?.trim() ?? '-1');
+      realTotalPoints += points;
+    }
+    const places = [];
+    function getPlace(pointObject, points) {
+      if (points === 0) {
+        return -1;
+      }
+      for (const [key, value] of Object.entries(pointObject)) {
+        if (value === points) {
+          return parseInt(key);
+        }
+      }
+      throw new Error(`Couldn't map placement points to place: ${points} Points`);
+    }
+    for (let i = 0; i < _tournaments.length - 1; ++i) {
+      const pointsText = _tournaments[i].textContent?.trim() ?? 'DNQ';
+      const teamPlace = pointsText === 'DNQ' ? 'DNQ' : getPlace(tournaments[i].points, parseInt(pointsText));
+      places.push(teamPlace);
+    }
+    const localTeam = {
+      name,
+      places,
+      points: realTotalPoints,
+      place
+    };
+    teams.push(localTeam);
+  }
+  return {
+    teams,
+    tournaments
+  };
+}
+function getPGCTeamByName(teams, name) {
+  for (const team of teams) {
+    if (team.name === name) {
+      return team;
+    }
+  }
+  throw new Error(`No team with name: ${name}`);
+}
+// keep in mind, that 16! = 20.922.789.888.000
+function possibleArrangements(teams, points) {
+  const result = [];
+  function allPermutations(temp, limits, index) {
+    if (index === temp.length) {
+      //stop condition for the recursion [base clause]
+      result.push(temp);
+      return;
+    }
+    for (let i = 0; i <= limits[index]; ++i) {
+      temp[index] = i;
+      allPermutations(temp, limits, index + 1); //recursive invokation, for next elements
+    }
+  }
+
+  const temp = new Array(teams.length).fill(undefined).map(_ => -1);
+  const limits = new Array(teams.length).fill(undefined).map(_ => 16);
+  allPermutations(temp, limits, 0);
+  console.log(result);
+  return result;
+}
+function calculatePGCPoints(alreadyPlayedTournaments) {
+  try {
+    const siteInfo = parsePGCSite(alreadyPlayedTournaments);
+    console.log(siteInfo);
+    const qualifiedTeams = siteInfo.teams.filter(team => {
+      return team.places[alreadyPlayedTournaments] != 'DNQ';
+    });
+    const activeTournament = siteInfo.tournaments[alreadyPlayedTournaments];
+    // just to tests
+    const arrangement = possibleArrangements([qualifiedTeams[0], qualifiedTeams[1]], activeTournament.points);
+  } catch (exception) {
+    console.error(exception);
+    console.log('Error in parsing PGC site');
+  }
+}
+function detectPage() {
+  switch (location.pathname) {
+    case '/pubg/PUBG_Global_Championship/2023/EMEA/Points':
+      calculatePGCPoints(2);
+      break;
+    default:
+      return;
+  }
+}
 ready(async () => {
-  console.log('test');
+  detectPage();
 });
 
 },{"./common":1}]},{},[2]);
