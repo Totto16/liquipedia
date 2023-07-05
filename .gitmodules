@@ -1,0 +1,15 @@
+[submodule "DPlayer"]
+	path = DPlayer
+	url = https://github.com/Totto16/DPlayer
+	ignore = dirty
+
+[submodule "desktop-connector-shared"]
+	path = DesktopConnector
+	url = https://github.com/Totto16/desktop-connector-shared
+	ignore = dirty
+
+[submodule "custom-transform"]
+	path = custom-transform
+	url = https://github.com/Totto16/custom-browserify-transform.git
+	ignore = dirty
+

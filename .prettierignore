@@ -1,0 +1,16 @@
+.vscode
+Greasemonkey
+*.md
+package-lock.json
+package.json
+.prettierrc
+.*ignore
+node_modules
+*.sh
+*.user.js
+temp/
+.eslinignore
+.prettierrc
+.prettierignore
+*.js
+*.json
