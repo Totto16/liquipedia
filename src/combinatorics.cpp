@@ -58,6 +58,12 @@ void updateStats(const uint8_t a[A], uint64_t (&result)[T], const uint8_t(&index
 
 using TeamResult = std::unordered_map<std::string, double>;
 
+#ifdef _WIN32
+using LoopType = int8_t;
+#elif
+using LoopType = uint8_t;
+#endif
+
 // n! options
 template <std::size_t T> TeamResult allPermutations(uint8_t alreadyPlayedTournaments) {
 	constexpr uint8_t P = 4;
@@ -82,7 +88,7 @@ template <std::size_t T> TeamResult allPermutations(uint8_t alreadyPlayedTournam
 		constexpr uint8_t Z = T - P;
 
 #pragma omp for
-		for(uint8_t i = 0; i < Z; ++i) {
+		for(LoopType i = 0; i < Z; ++i) {
 
 			uint64_t temp[T] = {};
 			constexpr uint8_t A = Z - 1;
