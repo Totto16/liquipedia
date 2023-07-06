@@ -15,6 +15,5 @@ node_modules
 .prettierignore
 temp/
 *.js
-DPlayer/
 other/
 jest.config.ts

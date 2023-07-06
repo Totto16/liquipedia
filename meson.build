@@ -49,7 +49,7 @@ add_project_arguments(
 inc_dirs = []
 src_files = []
 
-subdir('src')
+subdir('src/cpp')
 
 deps = []
 

@@ -5,15 +5,14 @@
     "private": true,
     "scripts": {
         "compile": "tsc",
-        "make": "npm run compile && browserify -p esmify --outfile ./liquipedia.user.js --entry ./temp/src/liquipedia.user.brows.js; rimraf ./temp/; rimraf liquipedia.user.js.tmp-*",
+        "make": "npm run compile && browserify -p esmify --outfile ./liquipedia.user.js --entry ./temp/liquipedia.user.brows.js; rimraf ./temp/; rimraf liquipedia.user.js.tmp-*",
         "build": "npm run make",
-        "dev": "nodemon --watch src/ -e .ts --exec \"npm run build || exit 1\"",
-        "dev:s": "nodemon --watch * -e brows.js --exec \"npm run make:sto\"",
+        "dev": "nodemon --watch src/ts/ -e .ts --exec \"npm run build || exit 1\"",
         "update": "npm update && npm-check -u",
         "prettier:debug": "npx prettier --check .",
         "prettier": "npx prettier --write .",
-        "format:staged": "eslint \"**/*.ts\" --fix && pretty-quick --staged --verbose --pattern \"**/*.{ts}\"  --ignore-path \"./.eslintignore\" ",
-        "format": "eslint \"**/*.ts\" --fix && npm run prettier"
+        "format:staged": "eslint \"src/ts/**/*.ts\" --fix && pretty-quick --staged --verbose --pattern \"**/*.{ts}\"  --ignore-path \"./.eslintignore\" ",
+        "format": "eslint \"src/ts/**/*.ts\" --fix && npm run prettier"
     },
     "gitHooks": {
         "pre-commit": "npm run format:staged && npm run prettier"

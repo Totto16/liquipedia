@@ -1,5 +1,5 @@
 {
-    "include": ["src/*.ts","src/types/*.d.ts"],
+    "include": ["src/ts/*.ts","src/ts/types/*.d.ts"],
     "compilerOptions": {
         "target": "es2021",
         "module": "es2022",
@@ -7,7 +7,7 @@
         "lib": ["es2021", "dom"],
         "outDir": "temp",
         "allowJs": true,
-        "rootDir": ".",
+        "rootDir": "src/ts/",
         "strict": true,
         "noImplicitAny": true,
         "esModuleInterop": true,
@@ -22,6 +22,6 @@
         "strict-boolean-expressions": true,
         "no-unnecessary-condition": true
     },
-    "types": ["src/types/*.d.ts","global.d.ts"],
-    "files": ["src/liquipedia.user.brows.ts"]
+    "types": ["src/ts/types/*.d.ts"],
+    "files": ["src/ts/liquipedia.user.brows.ts"]
 }
