@@ -43,7 +43,7 @@ template <std::size_t T> uint8_t allPermutations() {
 
 	Tournament tournament = get_current_tournament();
 
-	Team<4> teams = get_current_teams();
+	auto teams = get_current_teams();
 
 #pragma omp parallel
 	{
@@ -57,9 +57,7 @@ template <std::size_t T> uint8_t allPermutations() {
 
 			constexpr uint8_t A = T - 5;
 
-			QuickPerm<A>([&temp](uint8_t a[T]) {
-
-			});
+			QuickPerm<A>([&temp](uint8_t a[T]) { (void)a; });
 
 #pragma omp critical
 			{

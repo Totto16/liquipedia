@@ -9,7 +9,7 @@
 
 using Place = uint8_t;
 
-using TeamPlace = Place; // | 'DNQ' = 17
+using TeamPlace = Place; // | 'DNQ' = 17 || >= 17 invalid => -1
 
 using Points = uint16_t;
 
@@ -29,4 +29,6 @@ template <std::size_t T> struct Team {
 
 Tournament get_current_tournament();
 
-Team<4> get_current_teams();
+constexpr uint8_t AMOUNT = 27;
+
+std::array<Team<4>, AMOUNT> get_current_teams();

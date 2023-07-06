@@ -133,7 +133,9 @@ function parsePGCSite(alreadyPlayedTournaments: number): PGCSite {
         let realTotalPoints: number = 0;
 
         for (let i = 0; i < alreadyPlayedTournaments; ++i) {
-            const points = parseInt(_tournaments[i].textContent?.trim() ?? '-1');
+            const pointsText = _tournaments[i].textContent?.trim() ?? 'DNQ';
+
+            const points: number = pointsText === 'DNQ' ? 0 : parseInt(pointsText);
             realTotalPoints += points;
         }
 
@@ -209,10 +211,44 @@ function generateCPP(tournament: Tournament, teams: Team[]): string {
 
     let insertIntoMap = '';
     for (const [key, value] of Object.entries(tournament.points)) {
-        insertIntoMap += `\t\tpoints.insert_or_assign(${key}, ${value});\n`;
+        insertIntoMap += `        points.insert_or_assign(${key}, ${value});
+`;
     }
 
-    return `Tournament get_current_tournament(){
+    let teamsInsert = '';
+    for (let i = 0; i < teams.length; ++i) {
+        const team = teams[i];
+
+        let placesInsert = '';
+        for (let j = 0; j < team.places.length; ++j) {
+            let place = team.places[j];
+            if (place === 'DNQ' || place < 0) {
+                place = 17 as TeamPlace;
+            }
+            placesInsert += `
+            
+            places_${i}[${j}] = ${place};
+            `;
+        }
+
+        teamsInsert += `
+
+        std::array<TeamPlace, ${team.places.length}> places_${i}{};
+
+        ${placesInsert}
+
+        
+        const Team<${team.places.length}> team_${i} = Team<${team.places.length}>{"${team.name}", places_${i}, ${team.points}, ${team.place}};
+        teams[${i}] = team_${i};
+
+
+        `;
+    }
+
+    return `
+    #include <teams.hpp>
+
+    Tournament get_current_tournament(){
 
         ${autogen}
         
@@ -232,7 +268,26 @@ function generateCPP(tournament: Tournament, teams: Team[]): string {
     
         ${autogen}
         
-        }`;
+        }
+
+         // constexpr uint8_t AMOUNT = ${teams.length}; 
+        
+        std::array<Team<${teams[0].places.length}>, AMOUNT> get_current_teams() {
+            ${autogen}
+            std::array<Team<${teams[0].places.length}>, AMOUNT> teams{};
+
+
+            ${teamsInsert}
+
+        
+            return teams;
+            ${autogen}
+        }
+        
+        
+        
+        
+        `;
 }
 
 function calculatePGCPoints(alreadyPlayedTournaments: number): void {
