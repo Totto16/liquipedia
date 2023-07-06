@@ -4,11 +4,13 @@
 #include <cstdint>
 #include <cstdlib>
 #include <cstring>
+#include <functional>
 #include <iostream>
 #include <omp.h>
 #include <stdexcept>
 #include <utility>
 
+#include "helper.hpp"
 #include "permutations.hpp"
 #include "teams.hpp"
 
@@ -38,11 +40,16 @@ uint64_t factorial(const uint8_t n) {
 template <std::size_t T>
 void increase_advancers(uint64_t (&result)[T], const std::array<Points, T>& points) {
 
-	// TODO: also take into account MEA teams!
+	// TODO: also take into account MEA and EU (xD) guaranteed spot!
 
-	// std::pair<Points, uint8_t>
-	(void)result;
-	(void)points;
+	std::vector<uint8_t> indices =
+	    argSort<uint8_t>(points.cbegin(), points.cend(), std::greater<Points>());
+
+	// top 6 advance
+	for(uint8_t i = 0; i < 6; ++i) {
+		const uint8_t index = indices[i];
+		++result[index];
+	}
 }
 
 template <std::size_t T, std::size_t A>
@@ -71,51 +78,52 @@ using LoopType = uint8_t;
 #endif
 
 // n! options
-template <std::size_t T> TeamResult allPermutations(const uint8_t alreadyPlayedTournaments) {
-	constexpr uint8_t P = 4;
-	const uint64_t size = factorial(T - P);
+template <std::size_t TEAM_AMOUNT, std::size_t PERMUTATIONS = TEAM_AMOUNT>
+TeamResult allPermutations(const uint8_t alreadyPlayedTournaments) {
+	constexpr uint8_t P = PERMUTATIONS;
+	const uint64_t size = factorial(TEAM_AMOUNT - P);
 
-	uint64_t data[T] = {};
+	uint64_t data[TEAM_AMOUNT] = {};
 
 	const Tournament tournament = get_current_tournament();
 
 	const std::array<Team<4>, AMOUNT> teams = get_current_teams();
 
-	const std::array<Team<4>, T> participating_teams =
+	const std::array<Team<4>, TEAM_AMOUNT> participating_teams =
 	    get_participating_teams(alreadyPlayedTournaments);
 
-	std::array<Points, T> participating_team_points{};
-	for(uint8_t i = 0; i < T; ++i) {
+	std::array<Points, TEAM_AMOUNT> participating_team_points{};
+	for(uint8_t i = 0; i < TEAM_AMOUNT; ++i) {
 		participating_team_points[i] = participating_teams[i].points;
 	}
 
 #pragma omp parallel
 	{
-		constexpr uint8_t Z = T - P;
+		constexpr uint8_t Z = TEAM_AMOUNT - P;
 
 #pragma omp for
 		for(LoopType i = 0; i < Z; ++i) {
 
-			uint64_t temp[T] = {};
+			uint64_t temp[TEAM_AMOUNT] = {};
 			constexpr uint8_t A = Z - 1;
 
 			QuickPerm<A>([&](uint8_t a[A]) {
-				updateStats<T, A>(a, temp, static_cast<uint8_t>(i), participating_team_points,
-				                  tournament);
+				updateStats<TEAM_AMOUNT, A>(a, temp, static_cast<uint8_t>(i),
+				                            participating_team_points, tournament);
 			});
 
 #pragma omp critical
 			{
-				for(uint8_t j = 0; j < T; ++j) {
+				for(uint8_t j = 0; j < TEAM_AMOUNT; ++j) {
 					data[j] += temp[j];
 				}
-				std::cout << "Done loop " << static_cast<unsigned>(i) << "/" << T << "\n";
+				std::cout << "Done loop " << static_cast<unsigned>(i) << "/" << TEAM_AMOUNT << "\n";
 			}
 		}
 	}
 
 	TeamResult result{};
-	for(uint8_t i = 0; i < T; ++i) {
+	for(uint8_t i = 0; i < TEAM_AMOUNT; ++i) {
 		result.insert_or_assign(participating_teams[i].name,
 		                        static_cast<long double>(data[i]) / static_cast<long double>(size));
 	}
@@ -128,7 +136,7 @@ int main(void) {
 	//  16! = 20.922.789.888.000
 
 	// QuickPerm<6>([&](uint8_t a[6]) { display<6>(a); });
-	TeamResult permutations = allPermutations<16>(2);
+	TeamResult permutations = allPermutations<16, 8>(2);
 
 	std::cout << "\n";
 	for(auto const& [name, val] : permutations) {
