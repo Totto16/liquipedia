@@ -39,7 +39,7 @@ add_project_arguments(
         '-Wpointer-arith',
         '-Wrestrict',
         '-Wcast-qual',
-        '-Wno-missing-braces ',
+        '-Wno-missing-braces',
         checked: 'warn',
     ),
     language: 'cpp',
