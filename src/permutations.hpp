@@ -32,3 +32,10 @@ template <std::size_t N> void QuickPerm(std::function<void(uint8_t[N])> callback
 		}             // while(!p[i])
 	}                 // while(i < N)
 } // QuickPerm()
+
+template <std::size_t N> void display(uint8_t a[N]) {
+	for(unsigned int x = 0; x < N; x++) {
+		printf("%d ", a[x]);
+	}
+	printf("\n");
+}

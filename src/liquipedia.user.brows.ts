@@ -211,7 +211,7 @@ function generateCPP(tournament: Tournament, teams: Team[]): string {
 
     let insertIntoMap = '';
     for (const [key, value] of Object.entries(tournament.points)) {
-        insertIntoMap += `        points.insert_or_assign(${key}, ${value});
+        insertIntoMap += `        points.insert_or_assign(${+key -1}, ${value});
 `;
     }
 

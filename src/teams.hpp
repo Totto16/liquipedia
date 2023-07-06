@@ -4,6 +4,7 @@
 
 #include <array>
 #include <cstdint>
+#include <stdexcept>
 #include <string>
 #include <unordered_map>
 
@@ -32,3 +33,5 @@ Tournament get_current_tournament();
 constexpr uint8_t AMOUNT = 27;
 
 std::array<Team<4>, AMOUNT> get_current_teams();
+
+std::array<Team<4>, 16> get_participating_teams(uint8_t alreadyPlayedTournaments);
