@@ -4,6 +4,8 @@
 #include <functional>
 
 // NOTICE:  Copyright 1991-2010, Phillip Paul Fuchs
+
+// from: https://www.baeldung.com/cs/array-generate-all-permutations
 // https://www.quickperm.org/01example.php
 template <std::size_t N> void QuickPerm(std::function<void(uint8_t[N])> callback) {
 	uint8_t a[N], p[N + 1];

@@ -8,7 +8,7 @@ project(
     default_options: [
         'buildtype=release',
         'optimization=3',
-        'cpp_std=c++23',
+        'cpp_std=c++20',
         'strip=true',
         'b_ndebug=if-release',
         'warning_level=3',
@@ -17,6 +17,17 @@ project(
     version: '1.0.0',
 
 )
+
+cpp = meson.get_compiler('cpp')
+if cpp.get_id() == 'msvc'
+    add_project_arguments('/std:c++latest', language: 'cpp')
+elif cpp.get_id() == 'gcc'
+    add_project_arguments('-std=c++23', '-Wold-style-cast', language: 'cpp')
+elif cpp.get_id() == 'clang'
+    add_project_arguments('-std=c++2b', language: 'cpp')
+else
+    add_project_arguments('-std=c++20', language: 'cpp')
+endif
 
 inc_dirs = []
 src_files = []
