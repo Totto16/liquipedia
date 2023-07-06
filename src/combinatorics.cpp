@@ -94,7 +94,8 @@ template <std::size_t T> TeamResult allPermutations(uint8_t alreadyPlayedTournam
 			constexpr uint8_t A = Z - 1;
 
 			QuickPerm<A>([&](uint8_t a[A]) {
-				updateStats<T, A>(a, temp, i, participating_team_points, tournament);
+				updateStats<T, A>(a, temp, static_cast<uint8_t>(i), participating_team_points,
+				                  tournament);
 			});
 
 #pragma omp critical
