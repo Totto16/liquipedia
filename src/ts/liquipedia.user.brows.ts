@@ -97,7 +97,6 @@ function getPlace(pointObject: PointsObject, points: number): TeamPlace {
     throw new Error(`Couldn't map placement points to place: ${points} Points`);
 }
 
-
 function parsePGCSite(alreadyPlayedTournaments: number): PGCSite {
     const tables = document.querySelectorAll('.wikitable');
     if (tables.length !== 2) {
@@ -155,7 +154,6 @@ function parsePGCSite(alreadyPlayedTournaments: number): PGCSite {
 
         const places: TeamPlace[] = [];
 
-
         for (let i = 0; i < _tournaments.length - 1; ++i) {
             const pointsText = _tournaments[i].textContent?.trim() ?? 'DNQ';
 
@@ -210,12 +208,12 @@ function generateCPP(tournament: Tournament, teams: Team[]): string {
 
         teamsInsert += `
 
-        std::array<TeamPlace, ${team.places.length}> places_${i}{};
+        std::array<TeamPlace, TOURNAMENT_AMOUNT> places_${i}{};
 
         ${placesInsert}
 
         
-        const Team<${team.places.length}> team_${i} = Team<${team.places.length}>{"${team.name}", places_${i}, ${team.points}, ${team.place}};
+        const Team<TOURNAMENT_AMOUNT> team_${i} = Team<TOURNAMENT_AMOUNT>{"${team.name}", places_${i}, ${team.points}, ${team.place}};
         teams[${i}] = team_${i};
 
 
@@ -247,11 +245,12 @@ function generateCPP(tournament: Tournament, teams: Team[]): string {
         
         }
 
+         // constexpr uint8_t TOURNAMENT_AMOUNT =  ${teams[0].places.length}; 
          // constexpr uint8_t AMOUNT = ${teams.length}; 
         
-        std::array<Team<${teams[0].places.length}>, AMOUNT> get_current_teams() {
+        std::array<Team<TOURNAMENT_AMOUNT>, AMOUNT> get_current_teams() {
             ${autogen}
-            std::array<Team<${teams[0].places.length}>, AMOUNT> teams{};
+            std::array<Team<TOURNAMENT_AMOUNT>, AMOUNT> teams{};
 
 
             ${teamsInsert}
@@ -272,10 +271,8 @@ function calculatePGCPoints(alreadyPlayedTournaments: number): void {
         const siteInfo = parsePGCSite(alreadyPlayedTournaments);
         console.log(siteInfo);
         const qualifiedTeams: Team[] = siteInfo.teams.filter((team) => {
-            
             const place = team.places[alreadyPlayedTournaments];
-            return place !== 'DNQ' && place >= 1
-        
+            return place !== 'DNQ' && place >= 1;
         });
         const activeTournament = siteInfo.tournaments[alreadyPlayedTournaments];
         // just to tests

@@ -36,6 +36,8 @@ constexpr uint8_t TOURNAMENT_AMOUNT = 4;
 
 constexpr uint8_t NORMAL_TEAM_AMOUNT = 16;
 
+constexpr uint8_t ADVANCE_AMOUNT = 6;
+
 std::array<Team<TOURNAMENT_AMOUNT>, AMOUNT> get_current_teams();
 
 std::array<Team<TOURNAMENT_AMOUNT>, NORMAL_TEAM_AMOUNT>
