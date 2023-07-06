@@ -9,7 +9,7 @@
 template <class TYPE, class RAIter, class Compare>
 std::vector<TYPE> argSort(RAIter first, RAIter last, Compare comp) {
 
-	std::vector<TYPE> idx(last - first);
+	std::vector<TYPE> idx(static_cast<std::vector<TYPE>::size_type>(last - first));
 	std::iota(idx.begin(), idx.end(), 0);
 
 	auto idxComp = [&first, comp](TYPE i1, TYPE i2) { return comp(first[i1], first[i2]); };
