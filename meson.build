@@ -29,15 +29,19 @@ else
     add_project_arguments('-std=c++20', language: 'cpp')
 endif
 
+
 add_project_arguments(
-    '-Wconversion',
-    '-Wcast-align',
-    '-Wunused',
-    '-Wshadow',
-    '-Wpointer-arith',
-    '-Wrestrict',
-    '-Wcast-qual',
-    '-Wno-missing-braces ',
+    cpp.get_supported_arguments(
+        '-Wconversion',
+        '-Wcast-align',
+        '-Wunused',
+        '-Wshadow',
+        '-Wpointer-arith',
+        '-Wrestrict',
+        '-Wcast-qual',
+        '-Wno-missing-braces ',
+        checked: 'warn',
+    ),
     language: 'cpp',
 )
 
