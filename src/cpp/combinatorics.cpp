@@ -1,12 +1,17 @@
 
+#include <argparse/argparse.hpp>
 #include <array>
+#include <cmath>
 #include <concepts>
 #include <cstdint>
 #include <cstdlib>
 #include <cstring>
+#include <fstream>
 #include <functional>
+#include <iomanip>
 #include <iostream>
 #include <omp.h>
+#include <optional>
 #include <stdexcept>
 #include <utility>
 
@@ -79,7 +84,8 @@ using LoopType = uint8_t;
 
 // n! options
 template <std::size_t TEAM_AMOUNT, std::size_t PERMUTATIONS = TEAM_AMOUNT>
-TeamResult allPermutations(const uint8_t alreadyPlayedTournaments) {
+TeamResult allPermutations(const uint8_t alreadyPlayedTournaments,
+                           std::optional<std::string> CSVFile) {
 	constexpr uint8_t P = PERMUTATIONS;
 	const uint64_t size = factorial(TEAM_AMOUNT - P);
 
@@ -87,9 +93,9 @@ TeamResult allPermutations(const uint8_t alreadyPlayedTournaments) {
 
 	const Tournament tournament = get_current_tournament();
 
-	const std::array<Team<4>, AMOUNT> teams = get_current_teams();
+	const std::array<Team<TOURNAMENT_AMOUNT>, AMOUNT> teams = get_current_teams();
 
-	const std::array<Team<4>, TEAM_AMOUNT> participating_teams =
+	const std::array<Team<TOURNAMENT_AMOUNT>, TEAM_AMOUNT> participating_teams =
 	    get_participating_teams(alreadyPlayedTournaments);
 
 	std::array<Points, TEAM_AMOUNT> participating_team_points{};
@@ -99,13 +105,13 @@ TeamResult allPermutations(const uint8_t alreadyPlayedTournaments) {
 
 #pragma omp parallel
 	{
-		constexpr uint8_t Z = TEAM_AMOUNT - P;
+		constexpr uint8_t LOOP_AMOUNT = TEAM_AMOUNT - P;
 
 #pragma omp for
-		for(LoopType i = 0; i < Z; ++i) {
+		for(LoopType i = 0; i < LOOP_AMOUNT; ++i) {
 
 			uint64_t temp[TEAM_AMOUNT] = {};
-			constexpr uint8_t A = Z - 1;
+			constexpr uint8_t A = LOOP_AMOUNT - 1;
 
 			QuickPerm<A>([&](uint8_t a[A]) {
 				updateStats<TEAM_AMOUNT, A>(a, temp, static_cast<uint8_t>(i),
@@ -117,7 +123,8 @@ TeamResult allPermutations(const uint8_t alreadyPlayedTournaments) {
 				for(uint8_t j = 0; j < TEAM_AMOUNT; ++j) {
 					data[j] += temp[j];
 				}
-				std::cout << "Done loop " << static_cast<unsigned>(i) << "/" << TEAM_AMOUNT << "\n";
+				std::cout << "Done loop " << static_cast<unsigned>(i + 1) << "/"
+				          << static_cast<unsigned>(LOOP_AMOUNT) << "\n";
 			}
 		}
 	}
@@ -128,25 +135,62 @@ TeamResult allPermutations(const uint8_t alreadyPlayedTournaments) {
 		                        static_cast<long double>(data[i]) / static_cast<long double>(size));
 	}
 
+	if(CSVFile.has_value()) {
+		std::ofstream csv_result(CSVFile.value(), std::ios::out);
+		csv_result << "team name,percentage,absolut amount, total amount\n";
+
+		for(uint8_t i = 0; i < TEAM_AMOUNT; ++i) {
+			const Team<TOURNAMENT_AMOUNT>& team = participating_teams[i];
+			csv_result << team.name << "," << std::setprecision(23) << std::fixed
+			           << result.at(team.name) << "," << data[i] << "," << size << "\n";
+		}
+		csv_result.close();
+	}
+
 	return result;
 }
 
-int main(void) {
+int main(int argc, char const* argv[]) {
 
-	//  16! = 20.922.789.888.000
+	std::optional<std::string> CSVFile = std::nullopt;
 
-	// QuickPerm<6>([&](uint8_t a[6]) { display<6>(a); });
-	TeamResult permutations = allPermutations<16, 8>(2);
+	argparse::ArgumentParser parser{ "combinatorics", PROGRAMM_VERSION,
+		                             argparse::default_arguments::all };
+
+	parser.add_argument("-c", "--csvfile")
+	    .help("the path of a csv file used for storing the results");
+	try {
+		parser.parse_args(argc, argv);
+
+		if(auto path = parser.present("--csvfile")) {
+
+			CSVFile = path.value();
+		}
+
+	} catch(const std::exception& err) {
+		std::cerr << "error parsing command line arguments: " << err.what() << "\n";
+		std::exit(1);
+	}
+
+	TeamResult permutations = allPermutations<16, 7>(2, CSVFile);
+
+	long double sum = 0.0;
+	for(auto const& [name, val] : permutations) {
+		sum += val;
+	}
+
+	// top 6 advance!
+	long double abs_error = std::fabs(sum - static_cast<long double>(6.0));
+	if(abs_error >= 0.000000001) {
+		std::cerr << "Error: the calculations where wrong: off by" << abs_error << "\n";
+		std::exit(1);
+	}
 
 	std::cout << "\n";
 	for(auto const& [name, val] : permutations) {
 		std::cout << name << " has gone to PGC " << (val * 100) << " % of ALL "
 		          << "possible results"
 		             "\n";
-	}
-	std::cout << "\n";
-	for(auto const& [name, val] : permutations) {
-		printf("%s, %0.12Lf\n", name.c_str(), val);
 	}
 
 	return 0;

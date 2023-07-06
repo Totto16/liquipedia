@@ -32,6 +32,11 @@ Tournament get_current_tournament();
 
 constexpr uint8_t AMOUNT = 27;
 
-std::array<Team<4>, AMOUNT> get_current_teams();
+constexpr uint8_t TOURNAMENT_AMOUNT = 4;
 
-std::array<Team<4>, 16> get_participating_teams(uint8_t alreadyPlayedTournaments);
+constexpr uint8_t NORMAL_TEAM_AMOUNT = 16;
+
+std::array<Team<TOURNAMENT_AMOUNT>, AMOUNT> get_current_teams();
+
+std::array<Team<TOURNAMENT_AMOUNT>, NORMAL_TEAM_AMOUNT>
+get_participating_teams(uint8_t alreadyPlayedTournaments);

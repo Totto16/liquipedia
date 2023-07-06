@@ -2,7 +2,7 @@
 
 
 project(
-    'measure',
+    'liquipedia scripts',
     'cpp',
     license: 'MIT',
     default_options: [
@@ -53,14 +53,18 @@ subdir('src/cpp')
 
 deps = []
 
-omp_dep = dependency('OpenMP', required: true)
-deps += omp_dep
+deps += dependency('OpenMP', required: true)
 
+
+deps += dependency(
+    'argparse',
+    required: true,
+)
 executable(
     'combinatorics',
     src_files,
     include_directories: inc_dirs,
     dependencies: deps,
-    c_args: '-DLIBRARY_VERSION=@0@'.format(meson.project_version()),
+    cpp_args: '-DPROGRAMM_VERSION="@0@"'.format(meson.project_version()),
 )
 
