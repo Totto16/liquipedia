@@ -566,7 +566,7 @@ var _common = require("./common");
 // @name         liquipedia scripts
 // @namespace    Totto
 // @version      1.0.0_
-// @description  General Downloader manager for some sites (including s.to, streamkiste.tv, OpenOLAT) and JDownloader. Release Time:
+// @description  Some liquipedia scripts
 // @author       Totto
 // @compatible   firefox
 // @run-at       document-end

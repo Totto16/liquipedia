@@ -137,7 +137,7 @@
     },
     "overrides": [
         {
-            "files": ["downloader.user.brows.ts"],
+            "files": ["liquipedia.user.brows.ts"],
             "rules": {
                 "userscripts/filename-user": "warn",
                 "userscripts/no-invalid-metadata": "error"

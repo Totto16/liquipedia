@@ -1,10 +1,7 @@
 /.vscode
-/conanwiki.user.js
-/downloader.user.js
-/Hd-Streams.v3.user.js
 /node_modules
 /package-lock.json
-/s.to.user.js
 *tmp-browserify*
 test.txt
 temp/
+src/test.c
