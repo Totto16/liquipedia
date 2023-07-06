@@ -96,7 +96,7 @@ template <std::size_t T> TeamResult allPermutations(uint8_t alreadyPlayedTournam
 				for(uint8_t j = 0; j < T; ++j) {
 					data[j] += temp[j];
 				}
-				std::cout << "Done loop " << (unsigned)i << "/" << T << "\n";
+				std::cout << "Done loop " << static_cast<unsigned>(i) << "/" << T << "\n";
 			}
 		}
 	}
@@ -104,7 +104,7 @@ template <std::size_t T> TeamResult allPermutations(uint8_t alreadyPlayedTournam
 	TeamResult result{};
 	for(uint8_t i = 0; i < T; ++i) {
 		result.insert_or_assign(participating_teams[i].name,
-		                        (long double)data[i] / (long double)size);
+		                        static_cast<long double>(data[i]) / static_cast<long double>(size));
 	}
 
 	return result;
