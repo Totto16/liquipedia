@@ -396,7 +396,7 @@ std::array<Team<4>, AMOUNT> get_current_teams() {
 
 // NOT Auto generated
 
-std::array<Team<4>, 16> get_participating_teams(uint8_t alreadyPlayedTournaments) {
+std::array<Team<4>, 16> get_participating_teams(const uint8_t alreadyPlayedTournaments) {
 	const std::array<Team<4>, AMOUNT> teams = get_current_teams();
 
 	std::array<Team<4>, 16> participating_teams{};

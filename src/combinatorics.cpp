@@ -62,7 +62,7 @@ void updateStats(const uint8_t a[A], uint64_t (&result)[T], const uint8_t(&index
 	increase_advancers<T>(result, final_points);
 }
 
-using TeamResult = std::unordered_map<std::string, double>;
+using TeamResult = std::unordered_map<std::string, long double>;
 
 #ifdef _WIN32
 using LoopType = int8_t;
@@ -71,7 +71,7 @@ using LoopType = uint8_t;
 #endif
 
 // n! options
-template <std::size_t T> TeamResult allPermutations(uint8_t alreadyPlayedTournaments) {
+template <std::size_t T> TeamResult allPermutations(const uint8_t alreadyPlayedTournaments) {
 	constexpr uint8_t P = 4;
 	const uint64_t size = factorial(T - P);
 
@@ -138,7 +138,7 @@ int main(void) {
 	}
 	std::cout << "\n";
 	for(auto const& [name, val] : permutations) {
-		printf("%s, %0.12lf\n", name.c_str(), val);
+		printf("%s, %0.12Lf\n", name.c_str(), val);
 	}
 
 	return 0;
