@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         liquipedia scripts
 // @namespace    Totto
-// @version      1.0.0_
+// @version      1.0.1
 // @description  Some liquipedia scripts
 // @author       Totto
 // @compatible   firefox

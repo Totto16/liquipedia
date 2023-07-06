@@ -1,8 +1,7 @@
 {
     "name": "liquipedia-scripts",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "liquipedia scripts with npm and browserify for violentmonkey",
-    "main": "index.js",
     "private": true,
     "scripts": {
         "compile": "tsc",
