@@ -36,7 +36,7 @@ subdir('src')
 
 deps = []
 
-omp_dep = dependency('openmp', required: true)
+omp_dep = dependency('OpenMP', required: true)
 deps += omp_dep
 
 executable(
