@@ -35,6 +35,16 @@ uint64_t factorial(const uint8_t n) {
 	return factorial(n - 1) * n;
 }
 
+template <std::size_t T>
+void increase_advancers(uint64_t (&result)[T], const std::array<Points, T>& points) {
+
+	// TODO: also take into account MEA teams!
+
+	// std::pair<Points, uint8_t>
+	(void)result;
+	(void)points;
+}
+
 template <std::size_t T, std::size_t A>
 void updateStats(const uint8_t a[A], uint64_t (&result)[T], const uint8_t(&index),
                  const std::array<Points, T>& participating_team_points,
@@ -49,11 +59,7 @@ void updateStats(const uint8_t a[A], uint64_t (&result)[T], const uint8_t(&index
 		final_points[i] += tournament.points.at(place);
 	}
 
-	// TODO:
-	//	std::pair<Point, uint8_t>
-	(void)result;
-
-	// [advancements]
+	increase_advancers<T>(result, final_points);
 }
 
 using TeamResult = std::unordered_map<std::string, double>;

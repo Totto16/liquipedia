@@ -7,22 +7,23 @@ Tournament get_current_tournament() {
 
 	PointsObject points = PointsObject{};
 
-	points.insert_or_assign(0, 650);
-	points.insert_or_assign(1, 550);
-	points.insert_or_assign(2, 450);
-	points.insert_or_assign(3, 400);
-	points.insert_or_assign(4, 350);
-	points.insert_or_assign(5, 300);
-	points.insert_or_assign(6, 250);
-	points.insert_or_assign(7, 220);
-	points.insert_or_assign(8, 200);
-	points.insert_or_assign(9, 180);
-	points.insert_or_assign(10, 150);
-	points.insert_or_assign(11, 120);
-	points.insert_or_assign(12, 100);
-	points.insert_or_assign(13, 70);
-	points.insert_or_assign(14, 50);
-	points.insert_or_assign(15, 20);
+	points.insert_or_assign(static_cast<Place>(0), static_cast<Points>(650));
+	points.insert_or_assign(static_cast<Place>(1), static_cast<Points>(550));
+	points.insert_or_assign(static_cast<Place>(2), static_cast<Points>(450));
+	points.insert_or_assign(static_cast<Place>(3), static_cast<Points>(400));
+	points.insert_or_assign(static_cast<Place>(4), static_cast<Points>(350));
+	points.insert_or_assign(static_cast<Place>(5), static_cast<Points>(300));
+	points.insert_or_assign(static_cast<Place>(6), static_cast<Points>(250));
+	points.insert_or_assign(static_cast<Place>(7), static_cast<Points>(220));
+	points.insert_or_assign(static_cast<Place>(8), static_cast<Points>(200));
+	points.insert_or_assign(static_cast<Place>(9), static_cast<Points>(180));
+	points.insert_or_assign(static_cast<Place>(10), static_cast<Points>(150));
+	points.insert_or_assign(static_cast<Place>(11), static_cast<Points>(120));
+	points.insert_or_assign(static_cast<Place>(12), static_cast<Points>(100));
+	points.insert_or_assign(static_cast<Place>(13), static_cast<Points>(70));
+	points.insert_or_assign(static_cast<Place>(14), static_cast<Points>(50));
+	points.insert_or_assign(static_cast<Place>(15), static_cast<Points>(20));
+
 	std::string name = "PGS2 Qualifier";
 
 	Tournament tournament = { name, points };
