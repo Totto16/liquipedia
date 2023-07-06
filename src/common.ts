@@ -4,7 +4,7 @@ export function addStyle(css: string): void {
     document.head.appendChild(style);
 }
 
-export function ignore(...args: unknown[]): void {
+export function ignore(..._args: unknown[]): void {
     // just ignore
 }
 
@@ -272,11 +272,11 @@ export async function makeRequestAsync<N extends NormalObject = NormalObject>(op
     });
 }
 
-export function pJson<T = NormalObject, A = T>(input: string, defaultValue: A = {} as A): T | A {
+export function pJson<T = NormalObject, A = T>(input: string, defaultValueA: A = {} as A): T | A {
     try {
         return JSON.parse(input) as T;
     } catch (err) {
-        return defaultValue;
+        return defaultValueA;
     }
 }
 

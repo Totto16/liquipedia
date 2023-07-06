@@ -36,7 +36,7 @@ function addStyle(css) {
   style.innerHTML = css;
   document.head.appendChild(style);
 }
-function ignore(...args) {
+function ignore(..._args) {
   // just ignore
 }
 function defaultValue(val, _defaultValue) {
@@ -244,11 +244,11 @@ async function makeRequestAsync(options, logSilently = false) {
     });
   });
 }
-function pJson(input, defaultValue = {}) {
+function pJson(input, defaultValueA = {}) {
   try {
     return JSON.parse(input);
   } catch (err) {
-    return defaultValue;
+    return defaultValueA;
   }
 }
 function extension(arg) {
@@ -618,6 +618,17 @@ async function ready(callback, fully = false) {
     });
   }
 }
+function getPlace(pointObject, points) {
+  if (points === 0) {
+    return -1;
+  }
+  for (const [key, value] of Object.entries(pointObject)) {
+    if (value === points) {
+      return parseInt(key);
+    }
+  }
+  throw new Error(`Couldn't map placement points to place: ${points} Points`);
+}
 function parsePGCSite(alreadyPlayedTournaments) {
   const tables = document.querySelectorAll('.wikitable');
   if (tables.length !== 2) {
@@ -659,17 +670,6 @@ function parsePGCSite(alreadyPlayedTournaments) {
       realTotalPoints += points;
     }
     const places = [];
-    function getPlace(pointObject, points) {
-      if (points === 0) {
-        return -1;
-      }
-      for (const [key, value] of Object.entries(pointObject)) {
-        if (value === points) {
-          return parseInt(key);
-        }
-      }
-      throw new Error(`Couldn't map placement points to place: ${points} Points`);
-    }
     for (let i = 0; i < _tournaments.length - 1; ++i) {
       const pointsText = _tournaments[i].textContent?.trim() ?? 'DNQ';
       const teamPlace = pointsText === 'DNQ' ? 'DNQ' : getPlace(tournaments[i].points, parseInt(pointsText));
@@ -701,13 +701,13 @@ function possibleArrangements(teams, points) {
   const result = [];
   function allPermutations(temp, limits, index) {
     if (index === temp.length) {
-      //stop condition for the recursion [base clause]
+      // stop condition for the recursion [base clause]
       result.push(temp);
       return;
     }
     for (let i = 0; i <= limits[index]; ++i) {
       temp[index] = i;
-      allPermutations(temp, limits, index + 1); //recursive invokation, for next elements
+      allPermutations(temp, limits, index + 1); // recursive invokation, for next elements
     }
   }
 
@@ -817,7 +817,7 @@ function detectPage() {
       return;
   }
 }
-ready(async () => {
+void ready(() => {
   detectPage();
 });
 

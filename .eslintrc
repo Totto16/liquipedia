@@ -142,6 +142,12 @@
                 "userscripts/filename-user": "warn",
                 "userscripts/no-invalid-metadata": "error"
             }
+        },
+        {
+            "files": ["GM.d.ts"],
+            "rules": {
+                "camelcase": "off"
+            }
         }
     ],
     "globals": {
