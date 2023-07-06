@@ -40,6 +40,7 @@ add_project_arguments(
         '-Wrestrict',
         '-Wcast-qual',
         '-Wno-missing-braces',
+        '-Wsign-conversion',
         checked: 'warn',
     ),
     language: 'cpp',
