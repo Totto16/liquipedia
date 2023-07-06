@@ -60,7 +60,7 @@ using TeamResult = std::unordered_map<std::string, double>;
 
 #ifdef _WIN32
 using LoopType = int8_t;
-#elif
+#else
 using LoopType = uint8_t;
 #endif
 
